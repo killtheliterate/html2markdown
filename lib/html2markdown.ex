@@ -1,4 +1,6 @@
 defmodule Html2Markdown do
+  require Logger
+
   @moduledoc """
   A library for converting HTML to Markdown syntax in Elixir
   """
@@ -55,8 +57,7 @@ defmodule Html2Markdown do
     |> Floki.find("body")
     |> Floki.filter_out(:comment)
     |> remove_non_content_tags()
-
-    # |> remove_nav_elements()
+    |> remove_nav_elements()
   end
 
   defp prep_document(content) do
@@ -81,7 +82,11 @@ defmodule Html2Markdown do
         case List.keyfind(attrs, "class", 0) do
           {"class", class} ->
             if contains_nav_class?(class) && tag != "body" do
-              :delete
+              Logger.info("Qualified element as navigation: #{inspect(class)}")
+
+              # :delete
+
+              {tag, attrs}
             else
               {tag, attrs}
             end
