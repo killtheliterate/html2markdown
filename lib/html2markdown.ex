@@ -55,7 +55,8 @@ defmodule Html2Markdown do
     |> Floki.find("body")
     |> Floki.filter_out(:comment)
     |> remove_non_content_tags()
-    |> remove_nav_elements()
+
+    # |> remove_nav_elements()
   end
 
   defp prep_document(content) do
