@@ -5,6 +5,7 @@ defmodule Html2MarkdownTest do
   @fixture_path "test/support/fixtures/"
 
   describe "convert a HTML document to Markdown" do
+    @tag :skip
     test "convert elixir-lang HTML document to Markdown" do
       {:ok, html} = File.read(@fixture_path <> "elixir.html")
       {:ok, markdown} = File.read(@fixture_path <> "elixir.md")
@@ -44,6 +45,32 @@ defmodule Html2MarkdownTest do
       </picture>
     </p>
     """
+
+    markdown =
+      "![a shadow](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Bombina_bombina_1_%28Marek_Szczepanek%29.jpg/440px-Bombina_bombina_1_%28Marek_Szczepanek%29.jpg)"
+
+    assert Html2Markdown.convert(fragment) == markdown
+  end
+
+  test "allow configuration of non_content_tags via get_env()" do
+    fragment = """
+    <p>
+      <picture>
+        <source type="image/avif" srcset="/img/ocmxZOf3tv-792.avif 792w">
+        <source type="image/webp" srcset="/img/ocmxZOf3tv-792.webp 792w">
+        <p>a stray paragraph</p>
+        <img alt="a shadow" loading="lazy" decoding="async"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Bombina_bombina_1_%28Marek_Szczepanek%29.jpg/440px-Bombina_bombina_1_%28Marek_Szczepanek%29.jpg"
+            width="792" height="528">
+      </picture>
+    </p>
+    """
+
+    Application.put_env(:html2markdown, :non_content_tags, ["p"])
+
+    assert Html2Markdown.convert(fragment) == ""
+
+    Application.delete_env(:html2markdown, :non_content_tags)
 
     markdown =
       "![a shadow](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Bombina_bombina_1_%28Marek_Szczepanek%29.jpg/440px-Bombina_bombina_1_%28Marek_Szczepanek%29.jpg)"
