@@ -3,9 +3,9 @@ defmodule Html2Markdown do
   A library for converting HTML to Markdown syntax in Elixir
   """
 
-  @navigation_classes ["footer", "menu", "nav", "sidebar", "aside"]
+  @default_navigation_classes ["footer", "menu", "nav", "sidebar", "aside"]
 
-  @non_content_tags [
+  @default_non_content_tags [
     "aside",
     "audio",
     "base",
@@ -71,7 +71,7 @@ defmodule Html2Markdown do
   defp wrap_fragment(fragment), do: "<html><body>#{fragment}</body></html>"
 
   defp remove_non_content_tags(document) do
-    Enum.reduce(@non_content_tags, document, &Floki.filter_out(&2, &1))
+    Enum.reduce(non_content_tags(), document, &Floki.filter_out(&2, &1))
   end
 
   defp remove_nav_elements(document) do
@@ -95,7 +95,7 @@ defmodule Html2Markdown do
   end
 
   defp contains_nav_class?(string) do
-    Enum.any?(@navigation_classes, &String.contains?(string, &1))
+    Enum.any?(navigation_classes(), &String.contains?(string, &1))
   end
 
   defp convert_to_markdown(document) do
@@ -334,4 +334,12 @@ defmodule Html2Markdown do
 
   defp newline, do: "\n"
   defp newline(count), do: String.duplicate("\n", count)
+
+  defp navigation_classes do
+    Application.get_env(:html2markdown, :navigation_classes, @default_navigation_classes)
+  end
+
+  defp non_content_tags do
+    Application.get_env(:html2markdown, :non_content_tags, @default_non_content_tags)
+  end
 end
